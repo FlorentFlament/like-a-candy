@@ -13,7 +13,7 @@
 
 	echo ""
 	echo "-RAM-"
-framecnt	DS.B	1	; Rolling frame counter from 0 to 255
+framecnt	DS.B	2	; 2 bytes rolling frame counter
         INCLUDE "zik_variables.asm"
 ptr = tt_ptr			; Reusing tt_ptr as temporary pointer
 	INCLUDE "variables.asm"
@@ -47,45 +47,54 @@ main_loop:	SUBROUTINE
 	lda #39			; (/ (* 34.0 76) 64) = 40.375
 	sta TIM64T
         INCLUDE "zik_player.asm"
-	jsr fx_vblank
-	jsr wait_timint
+	jsr meta_fx_vblank
+	jsr .wait_timint
 
 .kernel:
 	; 248 Kernel lines
 	lda #19			; (/ (* 248.0 76) 1024) = 18.40
 	sta T1024T
-	jsr fx_kernel		; scanline 33 - cycle 23
-	jsr wait_timint		; scanline 289 - cycle 30
+	jsr meta_fx_kernel
+	jsr .wait_timint		; scanline 289 - cycle 30
 
 .overscan:
 	; 26 Overscan lines
 	lda #22			; (/ (* 26.0 76) 64) = 30.875
 	sta TIM64T
 	;; Update counters
+	jsr meta_fx_overscan
 	inc framecnt
-	jsr fx_overscan
-	jsr wait_timint
+	bne .continue
+	inc framecnt + 1 	; if framecnt drops to 0
+.continue:
+	jsr .wait_timint
 
 	jmp main_loop		; main_loop is far - scanline 308 - cycle 15
 
 
 ; X register must contain the number of scanlines to skip
 ; X register will have value 0 on exit
-wait_timint:
+.wait_timint:
 	lda TIMINT
-	beq wait_timint
+	beq .wait_timint
 	rts
 	echo "Main   size:", (* - MAIN_CODE_START)d, "bytes - Music player size"
 
-FX_START equ *
+META_FX_START equ *
+	INCLUDE "meta_fx.asm"
+	echo "Meta FX size:", (* - META_FX_START)d, "bytes"
+FX_PLAYFIELD_START equ *
 	INCLUDE "fx_playfield.asm"
-	echo "FX     size:", (* - FX_START)d, "bytes"
+	echo "FX playfield size:", (* - FX_PLAYFIELD_START)d, "bytes"
+FX_SPRITE_START equ *
+	INCLUDE "fx_sprite.asm"
+	echo "FX sprite size:", (* - FX_SPRITE_START)d, "bytes"
+
 
 	echo ""
 	echo "-TOTAL-"
 	echo "Used ROM:", (* - $F000)d, "bytes"
 	echo "Remaining ROM:", ($FFFC - *)d, "bytes"
-
 ;;;-----------------------------------------------------------------------------
 ;;; Reset Vector
 

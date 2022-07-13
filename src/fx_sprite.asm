@@ -59,7 +59,7 @@
 ;;; Functions used in main ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	
-fx_init:	SUBROUTINE
+fx_sprite_init:	SUBROUTINE
 	;; Sprites size
 	lda #$07
 	sta NUSIZ0
@@ -82,7 +82,7 @@ fx_init:	SUBROUTINE
 	sta COLUP1
 	rts
 
-fx_vblank:	SUBROUTINE
+fx_sprite_vblank:	SUBROUTINE
 	;; Choose Lemming sprite to display
 	lda framecnt
 	REPEAT 3
@@ -107,7 +107,7 @@ fx_vblank:	SUBROUTINE
 	POSITION_BOTH_SPRITES
 	rts
 
-fx_kernel:	SUBROUTINE
+fx_sprite_kernel:	SUBROUTINE
 	sta WSYNC
 	lda #$96
 	sta COLUBK
@@ -134,7 +134,7 @@ fx_kernel:	SUBROUTINE
 	sta COLUPF
 	rts
 
-fx_overscan:	SUBROUTINE
+fx_sprite_overscan:	SUBROUTINE
 	rts
 
 ;;; Lemming sprites animation

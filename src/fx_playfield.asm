@@ -1,4 +1,4 @@
-fx_init:	SUBROUTINE
+fx_playfield_init:	SUBROUTINE
 	;; Copy 6 pointers i.e 12 bytes to pfpic memory address
 	ldy #11
 .loop:
@@ -6,11 +6,11 @@ fx_init:	SUBROUTINE
 	sta pfpic_p0,Y
 	dey
 	bpl .loop
-fx_vblank:
-fx_overscan:
+fx_playfield_vblank:
+fx_playfield_overscan:
 	rts
 
-fx_kernel:	SUBROUTINE
+fx_playfield_kernel:	SUBROUTINE
 	;; Intialize colors
 	lda #$fe
 	sta COLUPF
