@@ -52,7 +52,6 @@
 	POSITION_SPRITE 1
 	sta WSYNC
 	sta HMOVE		; Commit sprites fine tuning
-	rts
     ENDM	
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
