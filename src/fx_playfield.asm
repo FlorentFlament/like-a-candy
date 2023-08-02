@@ -2,7 +2,7 @@ fx_playfield_init:	SUBROUTINE
 	;; Copy 6 pointers i.e 12 bytes to pfpic memory address
 	ldy #11
 .loop:
-	lda pf_40x40_credits_ptr,Y
+	lda pf_bambamhacko_ptr,Y
 	sta pfpic_p0,Y
 	dey
 	bpl .loop
@@ -47,47 +47,46 @@ fx_playfield_kernel:	SUBROUTINE
 ;;;
 ;;; DATA
 ;;;
-
-pf_40x40_credits_p0:
-	dc.b $00, $00, $00, $60, $f0, $30, $70, $60
-	dc.b $c0, $80, $00, $00, $00, $00, $00, $00
-	dc.b $00, $00, $00, $00, $f0, $30, $30, $90
-	dc.b $90, $10, $10, $10, $10, $30, $30, $70
-	dc.b $f0, $f0, $f0, $f0, $f0, $f0, $f0, $f0
-pf_40x40_credits_p1:
-	dc.b $00, $00, $01, $12, $9b, $d8, $9b, $19
-	dc.b $cc, $cc, $0c, $00, $00, $22, $22, $2a
-	dc.b $2a, $14, $00, $00, $ff, $ff, $fc, $f8
-	dc.b $f1, $73, $33, $93, $f3, $f3, $33, $11
-	dc.b $99, $ff, $ff, $ff, $ff, $ff, $ff, $ff
-pf_40x40_credits_p2:
-	dc.b $00, $00, $03, $27, $37, $36, $b2, $f1
-	dc.b $70, $e0, $c0, $80, $00, $53, $54, $22
-	dc.b $51, $56, $00, $00, $ff, $cf, $86, $e2
-	dc.b $f3, $f3, $e3, $83, $f3, $f3, $c7, $8f
-	dc.b $ff, $ff, $d9, $ae, $ae, $ae, $d9, $ff
-pf_40x40_credits_p3:
-	dc.b $00, $00, $00, $80, $c0, $c0, $d0, $80
-	dc.b $00, $20, $70, $30, $00, $c0, $00, $90
-	dc.b $40, $80, $00, $00, $f0, $f0, $b0, $90
-	dc.b $10, $10, $10, $50, $d0, $d0, $c0, $c0
-	dc.b $c0, $f0, $90, $a0, $90, $b0, $b0, $f0
-pf_40x40_credits_p4:
-	dc.b $00, $00, $00, $c0, $a0, $2e, $af, $ed
-	dc.b $cd, $0c, $00, $00, $00, $22, $a2, $b1
-	dc.b $a2, $9a, $00, $00, $ff, $f5, $70, $70
-	dc.b $34, $25, $a5, $a5, $a7, $22, $22, $32
-	dc.b $7f, $ff, $9f, $7f, $1f, $5f, $bf, $ff
-pf_40x40_credits_p5:
-	dc.b $00, $00, $00, $cc, $6c, $3c, $1c, $3d
-	dc.b $59, $99, $18, $00, $00, $01, $01, $00
-	dc.b $01, $01, $00, $00, $ff, $ff, $d7, $c7
-	dc.b $86, $a6, $a2, $aa, $aa, $ba, $b2, $92
-	dc.b $92, $ff, $ff, $ff, $ff, $ff, $ff, $ff
-pf_40x40_credits_ptr:
-	dc.w pf_40x40_credits_p0
-	dc.w pf_40x40_credits_p1
-	dc.w pf_40x40_credits_p2
-	dc.w pf_40x40_credits_p3
-	dc.w pf_40x40_credits_p4
-	dc.w pf_40x40_credits_p5
+pf_bambamhacko_p0:
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $00, $00, $00, $00, $00, $00, $00, $c0
+	dc.b $40, $c0, $40, $40, $40, $00, $00, $00
+pf_bambamhacko_p1:
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $00, $00, $00, $00, $00, $00, $00, $08
+	dc.b $09, $2a, $39, $28, $08, $00, $02, $1a
+	dc.b $ab, $1a, $00, $00, $00, $00, $00, $00
+pf_bambamhacko_p2:
+	dc.b $00, $00, $00, $06, $08, $ac, $aa, $2c
+	dc.b $20, $20, $00, $00, $00, $00, $00, $00
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $59, $c5, $59, $40, $40, $00, $04, $35
+	dc.b $56, $34, $10, $10, $10, $00, $00, $00
+pf_bambamhacko_p3:
+	dc.b $00, $00, $00, $80, $80, $b0, $a0, $30
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $d0, $40, $d0, $00, $00, $00, $00, $60
+	dc.b $50, $60, $00, $00, $00, $00, $00, $00
+pf_bambamhacko_p4:
+	dc.b $00, $00, $00, $00, $00, $9c, $15, $dd
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $80, $80, $80, $00, $00, $00, $88, $a8
+	dc.b $d8, $88, $00, $00, $00, $00, $00, $00
+pf_bambamhacko_p5:
+	dc.b $00, $00, $00, $00, $20, $2b, $1a, $2a
+	dc.b $08, $08, $00, $00, $00, $00, $00, $00
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $00, $00, $00, $00, $00, $00, $00, $00
+pf_bambamhacko_ptr:
+	dc.w pf_bambamhacko_p0
+	dc.w pf_bambamhacko_p1
+	dc.w pf_bambamhacko_p2
+	dc.w pf_bambamhacko_p3
+	dc.w pf_bambamhacko_p4
+	dc.w pf_bambamhacko_p5
