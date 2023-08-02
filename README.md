@@ -1,6 +1,4 @@
-# Rasfatari
-
-## Prerequisite
+# Prerequisite
 
 * This code has been written in DASM. The assembler can be downloaded
   from [DASM project's page](http://dasm-dillon.sourceforge.net/)
@@ -13,7 +11,7 @@
   the commands of the Makefile without using make.
 
 
-## Launching the intro
+# Launching the intro
 
     $ make
     dasm main.asm -f3 -omain.bin -lmain.lst -smain.sym -d
