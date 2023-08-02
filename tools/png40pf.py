@@ -6,6 +6,7 @@
 
 from os.path import basename
 import sys
+import argparse
 
 from PIL import Image
 
@@ -35,7 +36,15 @@ def playfields(l):
     return flatten(pfs)
 
 def main():
-    fname = sys.argv[1]
+    parser = argparse.ArgumentParser(description="Converts a black and white png image to dasm data usable by an Atari 2600 program.")
+    parser.add_argument("fname", type=str, help="Path to png image file")
+    parser.add_argument("-c", "--compact", action="store_true", help="Prints output data in a compact form")
+    parser.add_argument("-r", "--revert", action="store_true", help="Reverts the black and white")
+    args = parser.parse_args()
+
+    fname = args.fname
+    compact = args.compact
+    revert = args.revert
     # Convert to 1 byte in {0,255} per pixel
     im   = Image.open(fname)
 
@@ -48,8 +57,23 @@ def main():
     lines = [arr[i:i+40] for i in range(0, len(arr), 40)]
     pfs   = [playfields(l) for l in lines]
     pack  = pack_bytes(flatten(pfs))
-    #rev   = [~v & 0xff for v in pack]
-    print("pf_{}:".format(basename(fname).split(".")[0].replace("-","_")))
-    print(asmlib.lst2asm(pack, 6))
+    if revert:
+        pack = [~v & 0xff for v in pack]
+    img_name = basename(fname).split(".")[0].replace("-","_")
+    if compact:
+        print(f"pf_{img_name}:")
+        print(asmlib.lst2asm(pack, 6))
+    else:
+        for i in range(6): # 6 platfield registers
+            pack_pfs = reversed(pack[i:40*6:6]) # 40 lines
+            # Beware: reversing the lines to display them from end to start in Atari code
+            # There's a little gain of doing that.
+            print(f"pf_{img_name}_p{i}:")
+            print(asmlib.lst2asm(pack_pfs, 8))
+        # Print pointers
+        print(f"pf_{img_name}_ptr:")
+        for i in range(6):
+            print(f"\tdc.w pf_{img_name}_p{i}")
 
-main()
+if __name__ == "__main__":
+    main()
