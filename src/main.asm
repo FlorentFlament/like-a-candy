@@ -45,7 +45,18 @@ main_loop:	SUBROUTINE
 	; 34 VBlank lines (76 cycles/line)
 	lda #39			; (/ (* 34.0 76) 64) = 40.375
 	sta TIM64T
+
+        lda tt_cur_pat_index_c0
+        cmp #72                 ; Stop music when last pattern reached
+        bne .play_zik
+        ;; turn off volume, then skip music player
+        lda #0
+        sta AUDV0
+        sta AUDV1
+        jmp end_vblank
+.play_zik:
         INCLUDE "zik_player.asm"
+end_vblank:
         ;; run code in vblank here
 	jsr .wait_timint
 
@@ -61,7 +72,6 @@ main_loop:	SUBROUTINE
 	lda #22			; (/ (* 26.0 76) 64) = 30.875
 	sta TIM64T
         ;; Run code in overscan here
-.continue:
 	jsr .wait_timint
 
 	jmp main_loop		; main_loop is far - scanline 308 - cycle 15
