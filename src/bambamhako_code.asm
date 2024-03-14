@@ -13,7 +13,7 @@ bambamhako_init:        SUBROUTINE
 
 bambamhako_vblank:
         lda tt_cur_pat_index_c0
-        cmp #72                 ; Stop music when last pattern reached
+        cmp #54                 ; Stop music when last pattern reached
         bne .play_music
         ;; turn off volume, then skip music player
         lda #0
