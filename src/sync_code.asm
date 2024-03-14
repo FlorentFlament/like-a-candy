@@ -12,11 +12,11 @@ sync_kernel:    SUBROUTINE
         REPEND
         
         ldy #240
+        ldx frame_cnt
 .loop:
-        sta WSYNC
-        lda frame_cnt
-        lsr
-        sta COLUBK
+        sty WSYNC
+        stx COLUBK
+        inx
         dey
         bne .loop
 
