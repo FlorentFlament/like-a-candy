@@ -1,13 +1,12 @@
-INCDIRS=inc zik src
+INCDIRS=inc src
 DFLAGS=$(patsubst %,-I%,$(INCDIRS)) -f3 -d
 
 # asm files
 SRC=$(wildcard src/*.asm)
-ZIK=$(wildcard zik/*.asm)
 
 all: main.bin
 
-main.bin: src/main.asm $(SRC) $(ZIK)
+main.bin: src/main.asm $(SRC)
 	dasm $< -o$@ -lmain.lst -smain.sym $(DFLAGS)
 
 run: main.bin
