@@ -1,5 +1,5 @@
-bambamhako_init:
-        INCLUDE bambamhako_trackinit.asm
+bambamhako_init:        SUBROUTINE
+        INCLUDE "bambamhako_trackinit.asm"
 
         ;; Initialize fx_playfield with pf_bambamhacko data
 	;; Copy 6 pointers i.e 12 bytes to pfpic memory address
@@ -25,6 +25,9 @@ bambamhako_vblank:
 .end_vblank:
         ;; call the init function
         ;; move to the next FX
+        rts
+
+bambamhako_overscan:
         rts
 
 bambamhako_kernel:

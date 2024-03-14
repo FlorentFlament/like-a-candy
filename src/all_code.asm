@@ -1,5 +1,7 @@
-        INCLUDE "bambamhako_code.asm"
+        INCLUDE "timeline_code.asm"
         INCLUDE "fx_playfield_code.asm"
+        INCLUDE "sync_code.asm"
+        INCLUDE "bambamhako_code.asm"
 
 ;;; Music player wrapper
 tia_player:   
@@ -7,16 +9,38 @@ tia_player:
         rts
 
 main_init:
+        jsr timeline_init
         jsr bambamhako_init
         rts
         
 main_vblank:
-        jsr bambamhako_vblank
+        lda current_fx
+        asl
+        tay
+        lda timeline_vblanks+1,Y
+        pha
+        lda timeline_vblanks,Y
+        pha
         rts
 
 main_kernel:
-        jsr bambamhako_kernel
+        lda current_fx
+        asl
+        tay
+        lda timeline_kernels+1,Y
+        pha
+        lda timeline_kernels,Y
+        pha
         rts
 
 main_overscan:
+        lda current_fx
+        asl
+        tay
+        lda timeline_overscans+1,Y
+        pha
+        lda timeline_overscans,Y
+        pha
+
+        jsr timeline_overscan
         rts
