@@ -18,7 +18,7 @@ sync_kernel:    SUBROUTINE
 
         ldy #87
 .head_loop:
-        sty WSYNC
+        sta WSYNC
         lda ptr
         sta COLUBK
         inc ptr
@@ -50,14 +50,19 @@ sync_kernel:    SUBROUTINE
 	dey
 	bpl .outer
 
+        sta WSYNC
+        lda ptr
+        sta COLUBK
+        inc ptr
+
         lda #0
         sta PF0
         sta PF1
         sta PF2
 
-        ldy #87
+        ldy #86
 .foot_loop:
-        sty WSYNC
+        sta WSYNC
         lda ptr
         sta COLUBK
         inc ptr
