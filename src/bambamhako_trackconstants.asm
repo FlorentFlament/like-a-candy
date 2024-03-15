@@ -29,7 +29,7 @@ TT_GLOBAL_SPEED         = 1
 ; duration (number of TV frames) of a note
 TT_SPEED                = 3
 ; duration of odd frames (needs TT_USE_FUNKTEMPO)
-TT_ODD_SPEED            = 3
+TT_ODD_SPEED            = 2
 
 ; 1: Overlay percussion, +40 bytes
 TT_USE_OVERLAY          = 1
@@ -38,7 +38,7 @@ TT_USE_SLIDE            = 0
 ; 1: Goto pattern, +8 bytes
 TT_USE_GOTO             = 0
 ; 1: Odd/even rows have different SPEED values, +7 bytes
-TT_USE_FUNKTEMPO        = 0
+TT_USE_FUNKTEMPO        = 1
 ; If the very first notes played on each channel are not PAUSE, HOLD or
 ; SLIDE, i.e. if they start with an instrument or percussion, then set
 ; this flag to 0 to save 2 bytes.
