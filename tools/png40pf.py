@@ -38,13 +38,21 @@ def playfields(l):
 def main():
     parser = argparse.ArgumentParser(description="Converts a black and white png image to dasm data usable by an Atari 2600 program.")
     parser.add_argument("fname", type=str, help="Path to png image file")
-    parser.add_argument("-c", "--compact", action="store_true", help="Prints output data in a compact form")
+    parser.add_argument("-c", "--compact", action="store_true", help="Prints output data in a compact form (automatic for sprites)")
     parser.add_argument("-r", "--revert", action="store_true", help="Reverts the black and white")
+    parser.add_argument("-s", "--sprites", action="store_true", help="Generate data for sprites usage rather than playfieild")
     args = parser.parse_args()
 
     fname = args.fname
-    compact = args.compact
     revert = args.revert
+    sprites = args.sprites
+    if sprites:
+        compact = True
+        bytes_per_line = 8
+    else:
+        compact = args.compact
+        bytes_per_line = 6
+
     # Convert to 1 byte in {0,255} per pixel
     im   = Image.open(fname)
 
@@ -54,16 +62,22 @@ def main():
     grey = im.convert('L')
     sanity_check(grey)
     arr   = bool_array(grey)
-    lines = [arr[i:i+40] for i in range(0, len(arr), 40)]
-    pfs   = [playfields(l) for l in lines]
-    pack  = pack_bytes(flatten(pfs))
+
+    if sprites:
+        pack  = pack_bytes(arr)
+    else:
+        lines = [arr[i:i+40] for i in range(0, len(arr), 40)]
+        pfs   = [playfields(l) for l in lines]
+        pack  = pack_bytes(flatten(pfs))
+
     if revert:
         pack = [~v & 0xff for v in pack]
     img_name = basename(fname).split(".")[0].replace("-","_")
     if compact:
         print(f"pf_{img_name}:")
-        print(asmlib.lst2asm(pack, 6))
+        print(asmlib.lst2asm(pack, bytes_per_line))
     else:
+        # Only for playfield pictures
         for i in range(6): # 6 platfield registers
             pack_pfs = reversed(pack[i:40*6:6]) # 40 lines
             # Beware: reversing the lines to display them from end to start in Atari code
