@@ -15,8 +15,8 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-; Song author: 
-; Song name: 
+; Song author: Glafouk
+; Song name: Chloé éclot...
 
 ; @com.wudsn.ide.asm.hardware=ATARI2600
 
@@ -27,20 +27,20 @@
 ; 1: Global song speed, 0: Each pattern has individual speed
 TT_GLOBAL_SPEED         = 1
 ; duration (number of TV frames) of a note
-TT_SPEED                = 3
+TT_SPEED                = 4
 ; duration of odd frames (needs TT_USE_FUNKTEMPO)
-TT_ODD_SPEED            = 2
+TT_ODD_SPEED            = 3
 
 ; 1: Overlay percussion, +40 bytes
 TT_USE_OVERLAY          = 1
 ; 1: Melodic instrument slide, +9 bytes
 TT_USE_SLIDE            = 0
 ; 1: Goto pattern, +8 bytes
-TT_USE_GOTO             = 0
+TT_USE_GOTO             = 1
 ; 1: Odd/even rows have different SPEED values, +7 bytes
 TT_USE_FUNKTEMPO        = 1
 ; If the very first notes played on each channel are not PAUSE, HOLD or
 ; SLIDE, i.e. if they start with an instrument or percussion, then set
 ; this flag to 0 to save 2 bytes.
 ; 0: +2 bytes
-TT_STARTS_WITH_NOTES    = 0
+TT_STARTS_WITH_NOTES    = 1

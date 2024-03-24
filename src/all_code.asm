@@ -1,7 +1,7 @@
         INCLUDE "timeline_code.asm"
         INCLUDE "fx_playfield_code.asm"
         INCLUDE "sync_code.asm"
-        INCLUDE "bambamhako_code.asm"
+        INCLUDE "dance_code.asm"
 
 ;;; Music player wrapper
 tia_player:   
@@ -10,7 +10,7 @@ tia_player:
 
 main_init:
         jsr timeline_init
-        jsr bambamhako_init
+        jsr dance_init
         rts
         
 main_vblank:
