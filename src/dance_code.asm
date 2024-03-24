@@ -8,56 +8,57 @@ dance_init:        SUBROUTINE
 
 dance_vblank:
         jsr tia_player      ; play TIA
+        jsr fx_sprite_position
         rts
 
 dance_overscan:
+        ;; Black background color needed during overscan and vblank for proper TV sync
+        lda #$00
+        sta COLUBK
+
         dec beat_cnt
         bpl .continue
         lda #BEAT_CNT_INITVAL
         sta beat_cnt
-        lda anim_state
-        eor #$01
-        sta anim_state
+        inc anim_state
 .continue:
         rts
 
 dance_kernel SUBROUTINE
+        lda anim_state
+        lsr
+        lsr
+        and #$03
+        tax
+        lda background_color,X
+        sta WSYNC
+        sta COLUBK              ; Set background color asap
+        lda dance_color_low,X
+        sta ptr2
+        lda dance_color_high,X
+        sta ptr2+1
+
+        lda anim_state
+        and #$01
+        tax
+        lda sp1_bonhomme_low,X
+        sta ptr0
+        lda sp1_bonhomme_high,X
+        sta ptr0+1
+        lda sp2_bonhomme_low,X
+        sta ptr1
+        lda sp2_bonhomme_high,X
+        sta ptr1+1
+
+        lda #1
+        sta ptr3
+        ldy #15
+
         ldx #103
 .loop:
         sta WSYNC
         dex
         bpl .loop
 
-        lda anim_state
-        bne .bonhomme2
-        lda #<sp_bonhomme_1_bw_16x16_0
-        sta ptr0
-        lda #>sp_bonhomme_1_bw_16x16_0
-        sta ptr0+1
-        lda #<sp_bonhomme_1_bw_16x16_1
-        sta ptr1
-        lda #>sp_bonhomme_1_bw_16x16_1
-        sta ptr1+1
-        jmp .continue
-.bonhomme2:
-        lda #<sp_bonhomme_2_bw_16x16_0
-        sta ptr0
-        lda #>sp_bonhomme_2_bw_16x16_0
-        sta ptr0+1
-        lda #<sp_bonhomme_2_bw_16x16_1
-        sta ptr1
-        lda #>sp_bonhomme_2_bw_16x16_1
-        sta ptr1+1
-
-.continue:
-        lda #<dance_color
-        sta ptr2
-        lda #>dance_color
-        sta ptr2+1
-        lda #0
-        sta ptr3
-        lda #1
-        sta ptr4
-        ldy #15
         jsr fx_sprite_draw_2sprites
         rts

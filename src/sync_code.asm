@@ -1,6 +1,6 @@
 sync_vblank:
         lda frame_cnt + 1
-        cmp #1                  ; Next FX after 512 frames
+        cmp #2                  ; Next FX after 512 frames
         bne .continue
         inc current_fx
 .continue:

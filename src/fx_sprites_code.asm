@@ -3,16 +3,9 @@
 ;;; ptr0 - Pointer to sprite0
 ;;; ptr1 - Pointer to sprite1
 ;;; ptr2 - Pointer to colors
-;;; ptr3 - bgcolor
-;;; ptr4 - line_thickness -1
+;;; ptr3 - line_thickness -1
 ;;; Y - Picture lines count -1
 fx_sprite_draw_2sprites: SUBROUTINE
-        jsr fx_sprite_position
-
-        lda ptr3
-        sta COLUBK
-        sta WSYNC
-
 .loop:
         lda (ptr2),Y
         sta COLUP0
@@ -22,7 +15,7 @@ fx_sprite_draw_2sprites: SUBROUTINE
         lda (ptr1),Y
         sta GRP1
 
-        ldx ptr4
+        ldx ptr3
 .line_loop:
         sta WSYNC
         dex
