@@ -1,6 +1,6 @@
 sync_vblank:
         lda frame_cnt + 1
-        cmp #2                  ; Next FX after 512 frames
+        cmp #1                  ; Next FX after 512 frames
         bne .continue
         inc current_fx
 .continue:
@@ -14,14 +14,14 @@ sync_kernel:    SUBROUTINE
         lda #$00                ; Setting black Playfield color
         sta COLUPF
         lda frame_cnt
-        sta ptr                 ; Initializing color
+        sta ptr0                 ; Initializing color
 
         ldy #87
 .head_loop:
         sta WSYNC
-        lda ptr
+        lda ptr0
         sta COLUBK
-        inc ptr
+        inc ptr0
         dey
         bpl .head_loop
 
@@ -30,7 +30,7 @@ sync_kernel:    SUBROUTINE
         ldx #15                 ; 16 lines thick
 .inner:
         sta WSYNC
-        lda ptr
+        lda ptr0
         sta COLUBK
         lda pf_flush_sync_p0,Y
         sta PF0
@@ -44,16 +44,16 @@ sync_kernel:    SUBROUTINE
         sta PF1
         lda pf_flush_sync_p5,Y
         sta PF2
-        inc ptr
+        inc ptr0
 	dex
 	bpl .inner
 	dey
 	bpl .outer
 
         sta WSYNC
-        lda ptr
+        lda ptr0
         sta COLUBK
-        inc ptr
+        inc ptr0
 
         lda #0
         sta PF0
@@ -63,9 +63,9 @@ sync_kernel:    SUBROUTINE
         ldy #86
 .foot_loop:
         sta WSYNC
-        lda ptr
+        lda ptr0
         sta COLUBK
-        inc ptr
+        inc ptr0
         dey
         bpl .foot_loop
 

@@ -1,3 +1,3 @@
 ;;; Store current FX to play
-current_fx      DS.B    1
-frame_cnt       DS.W    2
+current_fx      ds.b    1
+frame_cnt       ds.w    1

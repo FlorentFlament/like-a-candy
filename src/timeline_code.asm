@@ -1,5 +1,5 @@
 timeline_init:
-        lda #$00
+        lda #$01
         sta current_fx
         rts
 
