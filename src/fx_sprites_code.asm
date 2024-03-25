@@ -36,8 +36,8 @@
 ;;; ptr4 - Pointer to background/playfield color
 ;;; Y - Picture lines count -1
 fx_sprite_draw_2sprites: SUBROUTINE
-        sta WSYNC
 .loop:
+        sta WSYNC
         lda (ptr4),Y
         sta COLUPF
         and #$01
@@ -57,7 +57,6 @@ fx_sprite_draw_2sprites: SUBROUTINE
         sta WSYNC
         dex
         bpl .line_loop
-
         dey
         bpl .loop
 

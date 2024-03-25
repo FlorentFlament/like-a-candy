@@ -1,5 +1,5 @@
 BEAT_TIMER_INITVAL = 27
-
+SPRITE_LINES = 23              ; +1
 
 dance_init:        SUBROUTINE
         INCLUDE "chloe-eclot_trackinit.asm"
@@ -39,7 +39,7 @@ dance_vblank:
         and #$03
         tax
         lda background_color,X
-        ldx #15
+        ldx #SPRITE_LINES
 .clear_bg_loop:        
         sta dance_bg,X
         dex
@@ -115,13 +115,13 @@ dance_kernel SUBROUTINE
         lda sp2_bonhomme_high,X
         sta ptr1+1
 
-        ldx #(120 - 16 - 1)
-        ldy #1
+        ldx #(120 - SPRITE_LINES)
+        ldy #0
         lda beat_cnt
         and #$08
         beq .single_size_sprites
-        ldx #(120 - 32 - 1)
-        ldy #3
+        ldx #(120 - 2*SPRITE_LINES)
+        ldy #2
 .single_size_sprites:
         sty ptr3
 
@@ -129,7 +129,7 @@ dance_kernel SUBROUTINE
         sta ptr4
         lda #>dance_bg
         sta ptr4+1
-        ldy #15
+        ldy #SPRITE_LINES                 ; lines count
 
 .loop:
         sta WSYNC
