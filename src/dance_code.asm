@@ -1,7 +1,9 @@
 BEAT_TIMER_INITVAL = 27
-SPRITE_LINES = 23              ; +1
-SINTABLE_LEN = 64
-SINTABLE_MAX = 21
+SPRITE_LINES = 32
+RASTER_WIDTH = 9
+BG_LINES = (2 * SPRITE_LINES)
+SINTABLE_LEN = 128
+SINTABLE_MAX = (BG_LINES - RASTER_WIDTH)
 RASTERS_COUNT = 3
 
 dance_init SUBROUTINE
@@ -56,7 +58,7 @@ dance_vblank SUBROUTINE
         and #$03
         tax
         lda background_color,X
-        ldx #SPRITE_LINES
+        ldx #(BG_LINES - 1)
 .clear_bg_loop:
         sta dance_bg,X
         dex
@@ -126,11 +128,10 @@ get_dancebar_depth:
         lda dancebar_pos,X
         sta ptr0
         lda frame_cnt
-        lsr
         clc
         adc ptr0
         adc #(SINTABLE_LEN / 4)
-        and #$3f        ; table length is 64 (Change if Length changes)
+        and #$7f        ; table length is 128 (Change if SINTABLE_LEN changes)
         tax
         lda dance_sintable,X
         rts
@@ -142,10 +143,9 @@ get_dancebar_height:
         lda dancebar_pos,X
         sta ptr0
         lda frame_cnt
-        lsr
         clc
         adc ptr0
-        and #$3f        ; table length is 64 (Change if Length changes)
+        and #$7f        ; table length is 128 (Change if SINTABLE_LEN changes)
         tax
         lda dance_sintable,X
         rts
@@ -168,14 +168,29 @@ draw_raster SUBROUTINE
         tax
         ldy ptr1
         lda dancebar_col,Y      ; bar chrominance in a
-        ora #$08                ; add luminance
+        ora #$02                ; add luminance
         ora ptr2                ; add other_side flag
         sta dance_bg,X          ; store in dance_bg
+        sta dance_bg+8,X
+        lda dancebar_col,Y      ; bar chrominance in a
+        ora #$04                ; add luminance
+        ora ptr2                ; add other_side flag
+        sta dance_bg+1,X
+        sta dance_bg+7,X
+        lda dancebar_col,Y      ; bar chrominance in a
+        ora #$06                ; add luminance
+        ora ptr2                ; add other_side flag
         sta dance_bg+2,X
+        sta dance_bg+6,X
+        lda dancebar_col,Y      ; bar chrominance in a
+        ora #$08                ; add luminance
+        ora ptr2                ; add other_side flag
+        sta dance_bg+3,X
+        sta dance_bg+5,X
         lda dancebar_col,Y      ; bar chrominance in a
         ora #$0a                ; add luminance
         ora ptr2                ; add other_side flag
-        sta dance_bg+1,X
+        sta dance_bg+4,X
         rts
 
 dance_overscan SUBROUTINE
@@ -229,12 +244,6 @@ dance_kernel SUBROUTINE
         ldy #2
 .single_size_sprites:
         sty ptr3
-
-        lda #<dance_bg
-        sta ptr4
-        lda #>dance_bg
-        sta ptr4+1
-        ldy #SPRITE_LINES                 ; lines count
 
 .loop:
         sta WSYNC

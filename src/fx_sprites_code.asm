@@ -33,12 +33,13 @@
 ;;; ptr2 - Pointer to sprite colors
 ;;; ptr3 - sprites size (0 for single size or 1 for double size)
 ;;; ptr3+1 - background color
-;;; ptr4 - Pointer to background/playfield color
-;;; Y - Picture lines count -1
-fx_sprite_draw_2sprites: SUBROUTINE
+fx_sprite_draw_2sprites SUBROUTINE
+        ldx #(BG_LINES - 1)
+        ldy #(SPRITE_LINES - 1)
+
 .loop:
         sta WSYNC
-        lda (ptr4),Y
+        lda dance_bg,X
         sta COLUPF
         and #$01
         asl
@@ -52,13 +53,30 @@ fx_sprite_draw_2sprites: SUBROUTINE
         lda (ptr1),Y
         sta GRP1
 
-        ldx ptr3
-.line_loop:
+        lda ptr3
+        beq .single_size_1
         sta WSYNC
+.single_size_1
+
+        ;; Intermediate background line
         dex
-        bpl .line_loop
+        sta WSYNC
+        lda dance_bg,X
+        sta COLUPF
+        and #$01
+        asl
+        asl
+        sta CTRLPF
+
+        lda ptr3
+        beq .single_size_2
+        sta WSYNC
+.single_size_2
+
+        dex
         dey
         bpl .loop
+        sta WSYNC
 
         lda ptr3+1
         sta COLUPF
