@@ -1,31 +1,46 @@
-BEAT_CNT_INITVAL = 27
+BEAT_TIMER_INITVAL = 27
+
 
 dance_init:        SUBROUTINE
         INCLUDE "chloe-eclot_trackinit.asm"
-        lda #BEAT_CNT_INITVAL
+        ;; Beat timer
+        lda #BEAT_TIMER_INITVAL
+        sta beat_timer
+        ;; Beat counter
+        ;; This determines the state of the animation
+        ;; bit  0  : picture to display (0 or 1)
+        ;; bits 2-3: colors to use
+        ;; bit  3  : size of sprite
+        lda #$00
         sta beat_cnt
         rts
 
 dance_vblank:
         jsr tia_player      ; play TIA
-        jsr fx_sprite_position
+        ldy #80             ; middle of the screen
+        lda beat_cnt
+        and #$08
+        tax
+        jsr fx_sprite_prepare
         rts
 
 dance_overscan:
+        sta WSYNC
         ;; Black background color needed during overscan and vblank for proper TV sync
         lda #$00
         sta COLUBK
 
-        dec beat_cnt
+        ;; Beat counter update
+        dec beat_timer
         bpl .continue
-        lda #BEAT_CNT_INITVAL
-        sta beat_cnt
-        inc anim_state
+        lda #BEAT_TIMER_INITVAL
+        sta beat_timer
+        inc beat_cnt
 .continue:
         rts
 
 dance_kernel SUBROUTINE
-        lda anim_state
+        lda beat_cnt
         lsr
         lsr
         and #$03
@@ -38,7 +53,7 @@ dance_kernel SUBROUTINE
         lda dance_color_high,X
         sta ptr2+1
 
-        lda anim_state
+        lda beat_cnt
         and #$01
         tax
         lda sp1_bonhomme_low,X
@@ -50,11 +65,17 @@ dance_kernel SUBROUTINE
         lda sp2_bonhomme_high,X
         sta ptr1+1
 
-        lda #1
-        sta ptr3
+        ldx #(120 - 16 - 1)
+        ldy #1
+        lda beat_cnt
+        and #$08
+        beq .single_size_sprites
+        ldx #(120 - 32 - 1)
+        ldy #3
+.single_size_sprites:
+        sty ptr3
         ldy #15
 
-        ldx #103
 .loop:
         sta WSYNC
         dex

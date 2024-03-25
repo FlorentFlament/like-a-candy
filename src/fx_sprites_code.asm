@@ -1,9 +1,37 @@
+;;; Position a sprite
+;;; Argument: Id for the sprite (0 or 1)
+;;; A : must contain Horizontal position
+;;; At the end:
+;;; A: is destroyed
+    MAC POSITION_SPRITE
+	sta WSYNC
+	SLEEP 14
+
+        ;;;;; Rough position of sprite ;;;;;
+	sec
+.rough_loop:
+	; The rough_loop consumes 15 (5*3) pixels
+	sbc #$0f	      ; 2 cycles
+	bcs .rough_loop ; 3 cycles
+	sta RESP{1}
+
+        ;;;;; Fine position of sprite ;;;;;
+	;; A register has value in [-15 .. -1]
+	clc
+	adc #$07 ; A in [-8 .. 6]
+	eor #$ff ; A in [-7 .. 7]
+    REPEAT 4
+	asl
+    REPEND
+	sta HMP{1} ; Fine position of missile or sprite
+    ENDM
+
 ;;; Draw a picture using 2 sprites
 ;;; Parameters:
 ;;; ptr0 - Pointer to sprite0
 ;;; ptr1 - Pointer to sprite1
 ;;; ptr2 - Pointer to colors
-;;; ptr3 - line_thickness -1
+;;; ptr3 - sprites size (0 for single size or 1 for double size)
 ;;; Y - Picture lines count -1
 fx_sprite_draw_2sprites: SUBROUTINE
 .loop:
@@ -29,31 +57,43 @@ fx_sprite_draw_2sprites: SUBROUTINE
         sta GRP1
         rts
 
+;;; Y should be 1 or 2 (for single or double size)
+fx_sprite_size SUBROUTINE
+        lda #$00
+        cpy #2
+        bne .single_size
+        lda #$05
+.single_size:
+        sta NUSIZ0
+        sta NUSIZ1
+        rts
 
-; Position the sprites
-; 12*8 = 96 pixels for the text
-; i.ie 32 pixels on each side (160 - 96)/2
-; +68 HBLANK = 100 pixels for RESP0
-; Must be aligned !
-	ALIGN 8
-fx_sprite_position SUBROUTINE
+;;; Position the scale the sprites
+;;; Y contains the position of the middle of the sprite
+;;; X contains the size of the sprites (0 single - non-0 double)
+        ALIGN 8
+fx_sprite_prepare SUBROUTINE
+        lda #8                  ; single size sprites
+        cpx #0
+        beq .single_size
+        lda #16                 ; double size sprites
+.single_size:
+        sta ptr0
+        tya
+        sec
+        sbc ptr0
+        POSITION_SPRITE 0
+        tya
+        POSITION_SPRITE 1
 	sta WSYNC
-        ; Rough P0 position = 15*x - 51
-        ; Rough P1 position = 15*x - 51 + 9
-	ldx #8                  ; 15*8 - 51 = 69
-.posit	dex		; 2
-	bne .posit	; 2** (3 if branching)
-	sta RESP0
-	sta RESP1
-	lda #$d0		; -> Pos SP1 72
-	sta HMP0
-	lda #$e0                ; -> Pos SP2 88
-	sta HMP1
-	sta WSYNC
-	sta HMOVE
+	sta HMOVE		; Commit sprites fine tuning
 
-	; Don't touch HMPx for 24 cycles
-	ldx #4
-.dont_hmp	dex
-	bpl .dont_hmp
-	rts
+        ;; Scale the sprites appropriately
+        lda #$00
+        cpx #0
+        beq .scale_single_size
+        lda #$05
+.scale_single_size:
+        sta NUSIZ0
+        sta NUSIZ1
+        rts
