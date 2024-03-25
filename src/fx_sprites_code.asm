@@ -30,11 +30,20 @@
 ;;; Parameters:
 ;;; ptr0 - Pointer to sprite0
 ;;; ptr1 - Pointer to sprite1
-;;; ptr2 - Pointer to colors
+;;; ptr2 - Pointer to sprite colors
 ;;; ptr3 - sprites size (0 for single size or 1 for double size)
+;;; ptr3+1 - background color
+;;; ptr4 - Pointer to background/playfield color
 ;;; Y - Picture lines count -1
 fx_sprite_draw_2sprites: SUBROUTINE
+        sta WSYNC
 .loop:
+        lda (ptr4),Y
+        sta COLUPF
+        and #$01
+        asl
+        asl
+        sta CTRLPF
         lda (ptr2),Y
         sta COLUP0
         sta COLUP1
@@ -52,6 +61,8 @@ fx_sprite_draw_2sprites: SUBROUTINE
         dey
         bpl .loop
 
+        lda ptr3+1
+        sta COLUPF
         lda #$00
         sta GRP0
         sta GRP1
@@ -71,7 +82,6 @@ fx_sprite_size SUBROUTINE
 ;;; Position the scale the sprites
 ;;; Y contains the position of the middle of the sprite
 ;;; X contains the size of the sprites (0 single - non-0 double)
-        ALIGN 8
 fx_sprite_prepare SUBROUTINE
         lda #8                  ; single size sprites
         cpx #0

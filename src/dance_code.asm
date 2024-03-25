@@ -13,6 +13,15 @@ dance_init:        SUBROUTINE
         ;; bit  3  : size of sprite
         lda #$00
         sta beat_cnt
+
+        ;; set Playfield on
+        lda #$ff
+        sta PF0
+        sta PF1
+        sta PF2
+        ;; Set colors to black though
+        lda #$00
+        sta COLUPF
         rts
 
 dance_vblank:
@@ -22,13 +31,53 @@ dance_vblank:
         and #$08
         tax
         jsr fx_sprite_prepare
+
+        ;; Clear background
+        lda beat_cnt
+        lsr
+        lsr
+        and #$03
+        tax
+        lda background_color,X
+        ldx #15
+.clear_bg_loop:        
+        sta dance_bg,X
+        dex
+        bpl .clear_bg_loop
+
+        lda frame_cnt
+        clc
+        adc #(64 / 4)
+        and #$3f
+        tax
+        ldy #$00
+        lda dance_sintable,X
+        cmp #8
+        bpl .other_side
+        ldy #$01
+.other_side:
+        sty ptr0                 ; temporary variable
+
+        lda frame_cnt
+        and #$3f                ; table length is 64
+        tax
+        lda dance_sintable,X
+        tax
+        lda #$68
+        ora ptr0
+        sta dance_bg,X
+        sta dance_bg+2,X
+        lda #$6a
+        ora ptr0
+        sta dance_bg+1,X
+        
         rts
 
 dance_overscan:
         sta WSYNC
         ;; Black background color needed during overscan and vblank for proper TV sync
         lda #$00
-        sta COLUBK
+        sta COLUPF
 
         ;; Beat counter update
         dec beat_timer
@@ -47,7 +96,8 @@ dance_kernel SUBROUTINE
         tax
         lda background_color,X
         sta WSYNC
-        sta COLUBK              ; Set background color asap
+        sta ptr3+1
+        sta COLUPF
         lda dance_color_low,X
         sta ptr2
         lda dance_color_high,X
@@ -74,6 +124,11 @@ dance_kernel SUBROUTINE
         ldy #3
 .single_size_sprites:
         sty ptr3
+
+        lda #<dance_bg
+        sta ptr4
+        lda #>dance_bg
+        sta ptr4+1
         ldy #15
 
 .loop:
