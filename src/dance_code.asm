@@ -1,5 +1,7 @@
 BEAT_TIMER_INITVAL = 27
 SPRITE_LINES = 23              ; +1
+SINTABLE_LEN = 64
+SINTABLE_MAX = 21
 
 dance_init SUBROUTINE
         INCLUDE "chloe-eclot_trackinit.asm"
@@ -13,6 +15,20 @@ dance_init SUBROUTINE
         ;; bit  3  : size of sprite
         lda #$00
         sta beat_cnt
+
+        ;; init dance bars
+        lda #0
+        sta dancebar_pos
+        lda #$80
+        sta dancebar_col
+        lda #(SINTABLE_LEN/3)
+        sta dancebar_pos+1
+        lda #$90
+        sta dancebar_col+1
+        lda #(2*SINTABLE_LEN/3)
+        sta dancebar_pos+2
+        lda #$20
+        sta dancebar_col+2
 
         ;; set Playfield on
         lda #$ff
@@ -45,38 +61,82 @@ dance_vblank SUBROUTINE
         dex
         bpl .clear_bg_loop
 
+        ldx #0
+        jsr draw_raster
+        ldx #1
+        jsr draw_raster
+        ldx #2
         jsr draw_raster
         rts
 
-;;; Draw rasters on background
-draw_raster SUBROUTINE
+sort_3dancebars SUBROUTINE
         lda frame_cnt
+        lsr
+        adc dancebar_pos
+        adc #(SINTABLE_LEN / 4) ; deep
+        lda frame_cnt
+        lsr
+        adc dancebar_pos
+        adc #(SINTABLE_LEN / 4) ; deep
+        rts
+
+;;; X dancebar index (0, 1, 2, ...)
+;;; Uses ptr0
+;;; returns dancebar depth in [0, SINTABLE_MAX[
+get_dancebar_depth:
+        lda dancebar_pos,X
+        sta ptr0
+        lda frame_cnt
+        lsr
         clc
-        adc #(64 / 4)
-        and #$3f
+        adc ptr0
+        adc #(SINTABLE_LEN / 4)
+        and #$3f        ; table length is 64 (Change if Length changes)
         tax
-        ldy #$00
         lda dance_sintable,X
-        cmp #8
+        rts
+
+;;; X dancebar index (0, 1, 2, ...)
+;;; Uses ptr0
+;;; returns dancebar height in [0, SINTABLE_MAX[
+get_dancebar_height:
+        lda dancebar_pos,X
+        sta ptr0
+        lda frame_cnt
+        lsr
+        clc
+        adc ptr0
+        and #$3f        ; table length is 64 (Change if Length changes)
+        tax
+        lda dance_sintable,X
+        rts
+
+;;; X: dancebar index
+;;; Draw raster on background
+draw_raster SUBROUTINE
+        stx ptr1                ; save dancebar index in ptr1
+        jsr get_dancebar_depth
+        ldy #$00
+        cmp #(SINTABLE_MAX / 2)
         bpl .other_side
         ldy #$01
 .other_side:
-        sty ptr0                 ; temporary variable
+        sty ptr2                 ; store other_side flag in ptr2
 
-        lda frame_cnt
-        and #$3f                ; table length is 64
+        ldx ptr1
+        jsr get_dancebar_height
         tax
-        lda dance_sintable,X
-        tax
-        lda #$68
-        ora ptr0
-        sta dance_bg,X
+        ldy ptr1
+        lda dancebar_col,Y      ; bar chrominance in a
+        ora #$08                ; add luminance
+        ora ptr2                ; add other_side flag
+        sta dance_bg,X          ; store in dance_bg
         sta dance_bg+2,X
-        lda #$6a
-        ora ptr0
+        lda dancebar_col,Y      ; bar chrominance in a
+        ora #$0a                ; add luminance
+        ora ptr2                ; add other_side flag
         sta dance_bg+1,X
         rts
-
 
 dance_overscan SUBROUTINE
         sta WSYNC
