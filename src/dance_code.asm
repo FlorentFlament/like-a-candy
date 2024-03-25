@@ -1,7 +1,7 @@
-BEAT_TIMER_INITVAL = 27
+BEAT_TIMER_INITVAL = 55
 SPRITE_LINES = 23              ; +1
 
-dance_init:        SUBROUTINE
+dance_init SUBROUTINE
         INCLUDE "chloe-eclot_trackinit.asm"
         ;; Beat timer
         lda #BEAT_TIMER_INITVAL
@@ -24,7 +24,7 @@ dance_init:        SUBROUTINE
         sta COLUPF
         rts
 
-dance_vblank:
+dance_vblank SUBROUTINE
         jsr tia_player      ; play TIA
         ldy #80             ; middle of the screen
         lda beat_cnt
@@ -32,7 +32,7 @@ dance_vblank:
         tax
         jsr fx_sprite_prepare
 
-        ;; Clear background
+;;; Clear background
         lda beat_cnt
         lsr
         lsr
@@ -40,11 +40,16 @@ dance_vblank:
         tax
         lda background_color,X
         ldx #SPRITE_LINES
-.clear_bg_loop:        
+.clear_bg_loop:
         sta dance_bg,X
         dex
         bpl .clear_bg_loop
 
+        jsr draw_raster
+        rts
+
+;;; Draw rasters on background
+draw_raster SUBROUTINE
         lda frame_cnt
         clc
         adc #(64 / 4)
@@ -70,10 +75,9 @@ dance_vblank:
         lda #$6a
         ora ptr0
         sta dance_bg+1,X
-        
-        rts
 
-dance_overscan:
+
+dance_overscan SUBROUTINE
         sta WSYNC
         ;; Black background color needed during overscan and vblank for proper TV sync
         lda #$00
