@@ -1,4 +1,4 @@
-BEAT_TIMER_INITVAL = 55
+BEAT_TIMER_INITVAL = 27
 SPRITE_LINES = 23              ; +1
 
 dance_init SUBROUTINE
@@ -75,6 +75,7 @@ draw_raster SUBROUTINE
         lda #$6a
         ora ptr0
         sta dance_bg+1,X
+        rts
 
 
 dance_overscan SUBROUTINE
