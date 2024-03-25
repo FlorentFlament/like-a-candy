@@ -2,6 +2,7 @@ BEAT_TIMER_INITVAL = 27
 SPRITE_LINES = 23              ; +1
 SINTABLE_LEN = 64
 SINTABLE_MAX = 21
+RASTERS_COUNT = 3
 
 dance_init SUBROUTINE
         INCLUDE "chloe-eclot_trackinit.asm"
@@ -61,23 +62,61 @@ dance_vblank SUBROUTINE
         dex
         bpl .clear_bg_loop
 
-        ldx #0
+;;; Draw rasters on buffer
+        jsr sort_3dancebars
+
+        lda #(RASTERS_COUNT-1)
+        sta ptr3
+.rasters_loop:
+        ldx ptr3
         jsr draw_raster
-        ldx #1
-        jsr draw_raster
-        ldx #2
-        jsr draw_raster
+        dec ptr3
+        bpl .rasters_loop
+
         rts
 
+;;; Uses ptr0 and ptr1
 sort_3dancebars SUBROUTINE
-        lda frame_cnt
-        lsr
-        adc dancebar_pos
-        adc #(SINTABLE_LEN / 4) ; deep
-        lda frame_cnt
-        lsr
-        adc dancebar_pos
-        adc #(SINTABLE_LEN / 4) ; deep
+        ldx #0
+        ldy #1
+        jsr compare_and_swap
+        ldx #1
+        ldy #2
+        jsr compare_and_swap
+        ldx #0
+        ldy #1
+        jsr compare_and_swap
+        rts
+
+;;; X: index of first dancebar
+;;; Y: index of seconde dancebar
+;;; Uses ptr0, ptr1 and ptr2
+compare_and_swap SUBROUTINE
+        stx ptr2                ; saves index of first dancebar in ptr2
+        jsr get_dancebar_depth
+        sta ptr1                ; depth of first dancebar in ptr1
+        tya
+        tax
+        jsr get_dancebar_depth  ; depth of second dancebar in A
+        cmp ptr1
+        bpl .sorted
+
+        ldx ptr2
+        ;; Swap dancebars pos
+        lda dancebar_pos,X      ; first dancebar pos
+        sta ptr1
+        lda dancebar_pos,Y      ; second dancebar pos
+        sta dancebar_pos,X
+        lda ptr1
+        sta dancebar_pos,Y
+        ;; Swap dancebars col
+        lda dancebar_col,X      ; first dancebar pos
+        sta ptr1
+        lda dancebar_col,Y      ; second dancebar pos
+        sta dancebar_col,X
+        lda ptr1
+        sta dancebar_col,Y
+.sorted:
         rts
 
 ;;; X dancebar index (0, 1, 2, ...)
@@ -113,6 +152,7 @@ get_dancebar_height:
 
 ;;; X: dancebar index
 ;;; Draw raster on background
+;;; Uses ptr0, ptr1 and ptr2
 draw_raster SUBROUTINE
         stx ptr1                ; save dancebar index in ptr1
         jsr get_dancebar_depth
