@@ -300,6 +300,6 @@ dance_kernel SUBROUTINE
         sta COLUPF
 
         ;; 58 scanlines for text kernel
-        jsr text_vblank         ; scanline 200
-        jsr text_kernel         ; scanline 206
-        rts                     ; scanline 252
+        jsr text_vblank
+        jsr text_kernel
+        rts

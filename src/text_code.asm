@@ -190,7 +190,6 @@ text_vblank:	SUBROUTINE
 	bne .end
 	lda #0			; Loop text
 	sta fx_text_idx
-	jsr fx_text_setup
 .end:
 	rts
 
