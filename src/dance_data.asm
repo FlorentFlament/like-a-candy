@@ -118,5 +118,5 @@ dancebar_data_pos_high:
 dancebar_data_cols:
         dc.b #$80, #$90, #$20, #$50, #$60, #$b0, #$40, #$c0
 dancebar_data_count:
-        dc.b #8, #1, #2, #3, #4, #5, #6, #7
+        dc.b #0, #1, #2, #3, #4, #5, #6, #7
         dc.b #8, #7, #6, #5, #4, #3, #2, #1

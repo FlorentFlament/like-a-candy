@@ -100,6 +100,57 @@
         lda dance_sintable,X
     ENDM
 
+;;; X: index of first dancebar
+;;; Y: index of seconde dancebar
+;;; Uses X, ptr0, ptr1 and ptr2
+    MAC COMPARE_AND_SWAP
+        stx ptr2                ; saves index of first dancebar in ptr2
+        GET_DANCEBAR_DEPTH
+        sta ptr1                ; depth of first dancebar in ptr1
+        tya
+        tax
+        GET_DANCEBAR_DEPTH      ; depth of second dancebar in A
+        cmp ptr1
+        bpl .sorted
+
+        ldx ptr2
+        ;; Swap dancebars pos
+        lda dancebar_pos,X      ; first dancebar pos
+        sta ptr1
+        lda dancebar_pos,Y      ; second dancebar pos
+        sta dancebar_pos,X
+        lda ptr1
+        sta dancebar_pos,Y
+        ;; Swap dancebars col
+        lda dancebar_col,X      ; first dancebar pos
+        sta ptr1
+        lda dancebar_col,Y      ; second dancebar pos
+        sta dancebar_col,X
+        lda ptr1
+        sta dancebar_col,Y
+.sorted:
+    ENDM
+
+;;; Rasters count in ptr3
+;;; Uses X, Y, ptr0, ptr1, ptr2, ptr3, ptr3+1
+    MAC SORT_RASTERS
+.outer_loop:
+        ldx #0
+        stx ptr3+1
+        ldy #1
+.inner_loop:
+        COMPARE_AND_SWAP
+        inc ptr3+1
+        ldx ptr3+1
+        iny
+        cpy ptr3
+        bne .inner_loop
+        dec ptr3
+        lda #1
+        cmp ptr3
+        bne .outer_loop
+    ENDM
+
 dance_init SUBROUTINE
         INCLUDE "chloe-eclot_trackinit.asm"
         ;; Beat timer
@@ -126,7 +177,14 @@ dance_init SUBROUTINE
 
 dance_vblank SUBROUTINE
 ;;; Sort rasters
-        ;; jsr sort_3dancebars
+        GET_RASTERS_COUNT
+        cmp #2
+        bpl .do_sort
+        jmp .dont_sort
+.do_sort:
+        sta ptr3
+        SORT_RASTERS
+.dont_sort:
 
 ;;; Draw rasters on buffer
         GET_RASTERS_COUNT
@@ -140,51 +198,6 @@ dance_vblank SUBROUTINE
         bpl .rasters_loop
 .no_rasters:
         rts
-
-;; ;;; Uses ptr0 and ptr1
-;; sort_3dancebars SUBROUTINE
-;;         ldx #0
-;;         ldy #1
-;;         jsr compare_and_swap
-;;         ldx #1
-;;         ldy #2
-;;         jsr compare_and_swap
-;;         ldx #0
-;;         ldy #1
-;;         jsr compare_and_swap
-;;         rts
-
-;;; X: index of first dancebar
-;;; Y: index of seconde dancebar
-;;; Uses ptr0, ptr1 and ptr2
-compare_and_swap SUBROUTINE
-        stx ptr2                ; saves index of first dancebar in ptr2
-        GET_DANCEBAR_DEPTH
-        sta ptr1                ; depth of first dancebar in ptr1
-        tya
-        tax
-        GET_DANCEBAR_DEPTH      ; depth of second dancebar in A
-        cmp ptr1
-        bpl .sorted
-
-        ldx ptr2
-        ;; Swap dancebars pos
-        lda dancebar_pos,X      ; first dancebar pos
-        sta ptr1
-        lda dancebar_pos,Y      ; second dancebar pos
-        sta dancebar_pos,X
-        lda ptr1
-        sta dancebar_pos,Y
-        ;; Swap dancebars col
-        lda dancebar_col,X      ; first dancebar pos
-        sta ptr1
-        lda dancebar_col,Y      ; second dancebar pos
-        sta dancebar_col,X
-        lda ptr1
-        sta dancebar_col,Y
-.sorted:
-        rts
-
 
 dance_overscan SUBROUTINE
     ;; Black background color needed during overscan and vblank for proper TV sync
@@ -242,8 +255,8 @@ dance_kernel SUBROUTINE
         tax
         lda background_color,X
         sta WSYNC
-        sta ptr3+1
         sta COLUPF
+        sta ptr3+1
         lda dance_color_low,X
         sta ptr2
         lda dance_color_high,X
@@ -261,12 +274,12 @@ dance_kernel SUBROUTINE
         lda sp2_bonhomme_high,X
         sta ptr1+1
 
-        ldx #(120 - SPRITE_LINES)
+        ldx #(DANCE_KER_HEIGHT/2 - SPRITE_LINES)
         ldy #0
         lda beat_cnt
         and #$08
         beq .single_size_sprites
-        ldx #(120 - 2*SPRITE_LINES)
+        ldx #(DANCE_KER_HEIGHT/2 - 2*SPRITE_LINES)
         ldy #2
 .single_size_sprites:
         sty ptr3
