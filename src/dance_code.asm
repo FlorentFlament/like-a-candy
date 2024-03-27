@@ -125,12 +125,6 @@ dance_init SUBROUTINE
         rts
 
 dance_vblank SUBROUTINE
-        ldy #80                 ; Horizontal middle of screen
-        lda beat_cnt
-        and #$08
-        tax                     ; Sprite size
-        jsr fx_sprite_prepare
-
 ;;; Sort rasters
         ;; jsr sort_3dancebars
 
@@ -230,6 +224,13 @@ dance_overscan SUBROUTINE
         sta dance_bg,X
         dex
         bpl .clear_bg_loop
+
+    ;;; Position dancer sprites
+        ldy #80                 ; Horizontal middle of screen
+        lda beat_cnt
+        and #$08
+        tax                     ; Sprite size
+        jsr fx_sprite_prepare
 
         rts
 

@@ -95,7 +95,7 @@ dancebar_data_pos_7:
         dc.b (4*SINTABLE_LEN/7), (5*SINTABLE_LEN/7), (6*SINTABLE_LEN/7)
 dancebar_data_pos_8:
         dc.b 0, (SINTABLE_LEN/8), (2*SINTABLE_LEN/8), (3*SINTABLE_LEN/8)
-        dc.b (4*SINTABLE_LEN/8), (5*SINTABLE_LEN/8), (6*SINTABLE_LEN/8),
+        dc.b (4*SINTABLE_LEN/8), (5*SINTABLE_LEN/8), (6*SINTABLE_LEN/8)
         dc.b (7*SINTABLE_LEN/8)
 dancebar_data_pos_low:
         dc.b <dancebar_data_pos_1
@@ -118,5 +118,5 @@ dancebar_data_pos_high:
 dancebar_data_cols:
         dc.b #$80, #$90, #$20, #$50, #$60, #$b0, #$40, #$c0
 dancebar_data_count:
-        dc.b #0, #1, #2, #3, #4, #5, #6, #7
+        dc.b #8, #1, #2, #3, #4, #5, #6, #7
         dc.b #8, #7, #6, #5, #4, #3, #2, #1
