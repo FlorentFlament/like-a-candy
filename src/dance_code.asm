@@ -151,6 +151,23 @@
         bne .outer_loop
     ENDM
 
+    MAC DANCE_PADDING
+        ldx #(DANCE_KER_HEIGHT/2 - SPRITE_LINES)
+        ldy #0
+        lda beat_cnt
+        and #$08
+        beq .single_size_sprites
+        ldx #(DANCE_KER_HEIGHT/2 - 2*SPRITE_LINES)
+        ldy #2
+.single_size_sprites:
+        sty ptr3
+
+.loop:
+        sta WSYNC
+        dex
+        bpl .loop
+    ENDM
+
 dance_init SUBROUTINE
         INCLUDE "chloe-eclot_trackinit.asm"
         ;; Beat timer
@@ -274,20 +291,15 @@ dance_kernel SUBROUTINE
         lda sp2_bonhomme_high,X
         sta ptr1+1
 
-        ldx #(DANCE_KER_HEIGHT/2 - SPRITE_LINES)
-        ldy #0
-        lda beat_cnt
-        and #$08
-        beq .single_size_sprites
-        ldx #(DANCE_KER_HEIGHT/2 - 2*SPRITE_LINES)
-        ldy #2
-.single_size_sprites:
-        sty ptr3
-
-.loop:
-        sta WSYNC
-        dex
-        bpl .loop
-
+        DANCE_PADDING
         jsr fx_sprite_draw
-        rts
+        DANCE_PADDING
+
+        lda $00
+        sta COLUBK
+        sta COLUPF
+
+        ;; 58 scanlines for text kernel
+        jsr text_vblank         ; scanline 200
+        jsr text_kernel         ; scanline 206
+        rts                     ; scanline 252
