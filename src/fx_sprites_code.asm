@@ -33,7 +33,7 @@
 ;;; ptr2 - Pointer to sprite colors
 ;;; ptr3 - sprites size (0 for single size or 1 for double size)
 ;;; ptr3+1 - background color
-fx_sprite_draw_2sprites SUBROUTINE
+fx_sprite_draw SUBROUTINE
         ldx #(BG_LINES - 1)
         ldy #(SPRITE_LINES - 1)
 
@@ -83,17 +83,6 @@ fx_sprite_draw_2sprites SUBROUTINE
         lda #$00
         sta GRP0
         sta GRP1
-        rts
-
-;;; Y should be 1 or 2 (for single or double size)
-fx_sprite_size SUBROUTINE
-        lda #$00
-        cpy #2
-        bne .single_size
-        lda #$05
-.single_size:
-        sta NUSIZ0
-        sta NUSIZ1
         rts
 
 ;;; Position and scale the sprites
