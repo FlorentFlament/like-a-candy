@@ -1,9 +1,8 @@
         INCLUDE "timeline_code.asm"
-        ;; INCLUDE "fx_playfield_code.asm"
         INCLUDE "fx_sprites_code.asm"
+        INCLUDE "text_code.asm"
         INCLUDE "sync_code.asm"
         INCLUDE "dance_code.asm"
-        INCLUDE "text_code.asm"
 
 ;;; Music player wrapper
 tia_player:   

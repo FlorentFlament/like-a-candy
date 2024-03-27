@@ -1,4 +1,4 @@
-LIGHT_GREY = $0c
+TEXT_COLOR = $0e
 
 ; Text to display is pointed to by ptr0
 	MAC m_fx_text_load
@@ -84,7 +84,7 @@ LIGHT_GREY = $0c
 	; This happens when writing HMOVE at the end of the scanline.
 	; L54: Display 2*8 lines
 	; This uses Y reg
-	lda #LIGHT_GREY
+	lda #TEXT_COLOR
 	sta COLUP0
 	sta COLUP1
 
