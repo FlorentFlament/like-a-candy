@@ -33,7 +33,7 @@ dance_color_4:
 padding:
         dc.b $00, $00, $00, $00, $00, $00, $00, $00
 background_color:
-        dc.b $00, $fe, $00, $fe
+        dc.b $02, $0c, $02, $0c
 
 sp1_bonhomme_low:
         dc.b <sp_bonhomme_1_bw_16x16_0
