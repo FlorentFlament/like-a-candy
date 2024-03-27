@@ -28,27 +28,27 @@
         tax
         ldy ptr1
         lda dancebar_col,Y      ; bar chrominance in a
-        ora #$02                ; add luminance
+        ora #$04                ; add luminance
         ora ptr2                ; add other_side flag
         sta dance_bg,X          ; store in dance_bg
         sta dance_bg+8,X
         lda dancebar_col,Y      ; bar chrominance in a
-        ora #$04                ; add luminance
+        ora #$06                ; add luminance
         ora ptr2                ; add other_side flag
         sta dance_bg+1,X
         sta dance_bg+7,X
         lda dancebar_col,Y      ; bar chrominance in a
-        ora #$06                ; add luminance
+        ora #$08                ; add luminance
         ora ptr2                ; add other_side flag
         sta dance_bg+2,X
         sta dance_bg+6,X
         lda dancebar_col,Y      ; bar chrominance in a
-        ora #$08                ; add luminance
+        ora #$0a                ; add luminance
         ora ptr2                ; add other_side flag
         sta dance_bg+3,X
         sta dance_bg+5,X
         lda dancebar_col,Y      ; bar chrominance in a
-        ora #$0a                ; add luminance
+        ora #$0c                ; add luminance
         ora ptr2                ; add other_side flag
         sta dance_bg+4,X
     ENDM
