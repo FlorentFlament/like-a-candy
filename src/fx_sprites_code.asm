@@ -96,7 +96,7 @@ fx_sprite_size SUBROUTINE
         sta NUSIZ1
         rts
 
-;;; Position the scale the sprites
+;;; Position and scale the sprites
 ;;; Y contains the position of the middle of the sprite
 ;;; X contains the size of the sprites (0 single - non-0 double)
 fx_sprite_prepare SUBROUTINE

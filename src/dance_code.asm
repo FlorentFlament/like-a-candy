@@ -1,11 +1,3 @@
-BEAT_TIMER_INITVAL = 27
-SPRITE_LINES = 32
-RASTER_WIDTH = 9
-BG_LINES = (2 * SPRITE_LINES)
-SINTABLE_LEN = 128
-SINTABLE_MAX = (BG_LINES - RASTER_WIDTH)
-RASTERS_COUNT = 3
-
 dance_init SUBROUTINE
         INCLUDE "chloe-eclot_trackinit.asm"
         ;; Beat timer
@@ -16,22 +8,9 @@ dance_init SUBROUTINE
         ;; bit  0  : picture to display (0 or 1)
         ;; bits 2-3: colors to use
         ;; bit  3  : size of sprite
+        ;; bits 4-6: rasters count
         lda #$00
         sta beat_cnt
-
-        ;; init dance bars
-        lda #0
-        sta dancebar_pos
-        lda #$80
-        sta dancebar_col
-        lda #(SINTABLE_LEN/3)
-        sta dancebar_pos+1
-        lda #$90
-        sta dancebar_col+1
-        lda #(2*SINTABLE_LEN/3)
-        sta dancebar_pos+2
-        lda #$20
-        sta dancebar_col+2
 
         ;; set Playfield on
         lda #$ff
@@ -43,6 +22,34 @@ dance_init SUBROUTINE
         sta COLUPF
         rts
 
+;;; Y number of bars
+dance_init_bars SUBROUTINE
+        dey
+        bmi .end
+        lda dancebar_data_pos_low,Y
+        sta ptr0
+        lda dancebar_data_pos_high,Y
+        sta ptr0+1
+.loop:
+        lda (ptr0),Y
+        sta dancebar_pos,Y
+        lda dancebar_data_cols,Y
+        sta dancebar_col,Y
+        dey
+        bpl .loop
+.end:
+        rts
+
+    MAC GET_RASTERS_COUNT
+        lda beat_cnt
+        REPEAT 4
+        lsr
+        REPEND
+        and #$0f
+        tax
+        lda dancebar_data_count,X
+    ENDM
+
 dance_vblank SUBROUTINE
         jsr tia_player      ; play TIA
         ldy #80             ; middle of the screen
@@ -51,30 +58,19 @@ dance_vblank SUBROUTINE
         tax
         jsr fx_sprite_prepare
 
-;;; Clear background
-        lda beat_cnt
-        lsr
-        lsr
-        and #$03
-        tax
-        lda background_color,X
-        ldx #(BG_LINES - 1)
-.clear_bg_loop:
-        sta dance_bg,X
-        dex
-        bpl .clear_bg_loop
-
 ;;; Draw rasters on buffer
-        jsr sort_3dancebars
+        ;; jsr sort_3dancebars
 
-        lda #(RASTERS_COUNT-1)
+        GET_RASTERS_COUNT
         sta ptr3
+        dec ptr3
+        bmi .no_rasters_loop
 .rasters_loop:
         ldx ptr3
         jsr draw_raster
         dec ptr3
         bpl .rasters_loop
-
+.no_rasters_loop:
         rts
 
 ;;; Uses ptr0 and ptr1
@@ -206,6 +202,29 @@ dance_overscan SUBROUTINE
         sta beat_timer
         inc beat_cnt
 .continue:
+
+;;; init dance bars
+        lda beat_cnt            ; bits 4-5: rasters count
+        and #$0f
+        bne .no_init_dance_bars
+        GET_RASTERS_COUNT
+        tay
+        jsr dance_init_bars
+.no_init_dance_bars:
+
+;;; Clear background
+        lda beat_cnt
+        lsr
+        lsr
+        and #$03
+        tax
+        lda background_color,X
+        ldx #(BG_LINES - 1)
+.clear_bg_loop:
+        sta dance_bg,X
+        dex
+        bpl .clear_bg_loop
+
         rts
 
 dance_kernel SUBROUTINE

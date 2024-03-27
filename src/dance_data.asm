@@ -75,3 +75,42 @@ dance_sintable:
 	dc.b $02, $03, $03, $04, $05, $05, $06, $07
 	dc.b $08, $09, $0a, $0b, $0c, $0d, $0f, $10
 	dc.b $11, $12, $14, $15, $16, $17, $19, $1a
+
+dancebar_data_pos_1:
+        dc.b 0
+dancebar_data_pos_2:
+        dc.b 0, (SINTABLE_LEN/2)
+dancebar_data_pos_3:
+        dc.b 0, (SINTABLE_LEN/3), (2*SINTABLE_LEN/3)
+dancebar_data_pos_4:
+        dc.b 0, (SINTABLE_LEN/4), (2*SINTABLE_LEN/4), (3*SINTABLE_LEN/4)
+dancebar_data_pos_5:
+        dc.b 0, (SINTABLE_LEN/5), (2*SINTABLE_LEN/5), (3*SINTABLE_LEN/5)
+        dc.b (4*SINTABLE_LEN/5)
+dancebar_data_pos_6:
+        dc.b 0, (SINTABLE_LEN/6), (2*SINTABLE_LEN/6), (3*SINTABLE_LEN/6)
+        dc.b (4*SINTABLE_LEN/6), (5*SINTABLE_LEN/6)
+dancebar_data_pos_7:
+        dc.b 0, (SINTABLE_LEN/7), (2*SINTABLE_LEN/7), (3*SINTABLE_LEN/7)
+        dc.b (4*SINTABLE_LEN/7), (5*SINTABLE_LEN/7), (6*SINTABLE_LEN/7)
+dancebar_data_pos_low:
+        dc.b <dancebar_data_pos_1
+        dc.b <dancebar_data_pos_2
+        dc.b <dancebar_data_pos_3
+        dc.b <dancebar_data_pos_4
+        dc.b <dancebar_data_pos_5
+        dc.b <dancebar_data_pos_6
+        dc.b <dancebar_data_pos_7
+dancebar_data_pos_high:
+        dc.b >dancebar_data_pos_1
+        dc.b >dancebar_data_pos_2
+        dc.b >dancebar_data_pos_3
+        dc.b >dancebar_data_pos_4
+        dc.b >dancebar_data_pos_5
+        dc.b >dancebar_data_pos_6
+        dc.b >dancebar_data_pos_7
+dancebar_data_cols:
+        dc.b #$80, #$90, #$20, #$50, #$60, #$b0, #$00
+dancebar_data_count:
+        dc.b #0, #1, #2, #3, #4, #5, #6, #7
+        dc.b #7, #6, #5, #4, #3, #2, #1, #0
