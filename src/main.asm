@@ -40,8 +40,8 @@ main_loop:	SUBROUTINE
     ENDM
 
 .vblank:
-;;; 64 vblank scanlines
-	lda #75
+;;; 48 vblank scanlines
+	lda #57
 	sta TIM64T
         jsr main_vblank
 	WAIT_TIMINT
@@ -54,8 +54,8 @@ main_loop:	SUBROUTINE
 	WAIT_TIMINT
 
 .overscan:
-;;; 45 overscan scanlines (inc. vertical sync)
-	lda #48
+;;; 60 overscan scanlines (inc. vertical sync)
+	lda #66
 	sta TIM64T
         jsr main_overscan
 	WAIT_TIMINT

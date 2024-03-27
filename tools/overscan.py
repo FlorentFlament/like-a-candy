@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import math
 
-VBLANK_COMPUTE = 63 # 61 scanlines in Stella
-OVERSCAN_COMPUTE = 19 # 17 scanlines in Stella
+VBLANK_COMPUTE = 33 # 61 scanlines in Stella
+OVERSCAN_COMPUTE = 44 # 17 scanlines in Stella
 
 CLOCKS_PER_LINE = 76
 

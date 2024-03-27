@@ -14,6 +14,22 @@ sp_bonhomme_2_bw_16x16_1:
         dc.b $00, $00, $00, $00, $00, $00, $00, $00
 	dc.b $b0, $60, $60, $c0, $c0, $e0, $e0, $e0
 	dc.b $e4, $fc, $f8, $e0, $80, $80, $80, $80
+sp_bonhomme_3_bw_16x16_0:
+        dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $0c, $0c, $0c, $0c, $0c, $0f, $0f, $2f
+	dc.b $2f, $3f, $3f, $0f, $07, $07, $07, $07
+sp_bonhomme_3_bw_16x16_1:
+        dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $60, $60, $60, $60, $60, $e0, $e0, $e8
+	dc.b $e8, $f8, $f8, $e0, $00, $00, $00, $00
+sp_bonhomme_4_bw_16x16_0:
+        dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $06, $06, $06, $06, $06, $0f, $0f, $2f
+	dc.b $2f, $3f, $3f, $0f, $01, $01, $01, $01
+sp_bonhomme_4_bw_16x16_1:
+        dc.b $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b $c0, $c0, $c0, $c0, $c0, $e0, $e0, $e8
+	dc.b $e8, $f8, $f8, $e0, $c0, $c0, $c0, $c0
 dance_color_1:
         dc.b $00, $00, $00, $00, $00, $00, $00, $00
         dc.b $fe, $5a, $fe, $fe, $fe, $fe, $fe, $fe
@@ -32,21 +48,31 @@ dance_color_4:
         dc.b $00, $00, $00, $00, $00, $00, $2a, $00
 padding:
         dc.b $00, $00, $00, $00, $00, $00, $00, $00
+
 background_color:
         dc.b $02, $0c, $02, $0c
 
 sp1_bonhomme_low:
         dc.b <sp_bonhomme_1_bw_16x16_0
         dc.b <sp_bonhomme_2_bw_16x16_0
+        dc.b <sp_bonhomme_3_bw_16x16_0
+        dc.b <sp_bonhomme_4_bw_16x16_0
 sp1_bonhomme_high:
         dc.b >sp_bonhomme_1_bw_16x16_0
         dc.b >sp_bonhomme_2_bw_16x16_0
+        dc.b >sp_bonhomme_3_bw_16x16_0
+        dc.b >sp_bonhomme_4_bw_16x16_0
 sp2_bonhomme_low:
         dc.b <sp_bonhomme_1_bw_16x16_1
         dc.b <sp_bonhomme_2_bw_16x16_1
+        dc.b <sp_bonhomme_3_bw_16x16_1
+        dc.b <sp_bonhomme_4_bw_16x16_1
 sp2_bonhomme_high:
         dc.b >sp_bonhomme_1_bw_16x16_1
         dc.b >sp_bonhomme_2_bw_16x16_1
+        dc.b >sp_bonhomme_3_bw_16x16_1
+        dc.b >sp_bonhomme_4_bw_16x16_1
+
 dance_color_low:
         dc.b <dance_color_1
         dc.b <dance_color_2
@@ -57,6 +83,9 @@ dance_color_high:
         dc.b >dance_color_2
         dc.b >dance_color_3
         dc.b >dance_color_4
+
+bonhomme_sequence:
+        dc.b 0,1,0,1,2,3,2,3
 
 dance_sintable:
 	dc.b $1c, $1d, $1e, $20, $21, $22, $23, $25

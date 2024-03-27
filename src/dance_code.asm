@@ -193,6 +193,9 @@ dance_init SUBROUTINE
         rts
 
 dance_vblank SUBROUTINE
+    ;; Play the music
+        jsr tia_player
+
     ;;; Position dancer sprites
         ldy #80                 ; Horizontal middle of screen
         lda beat_cnt
@@ -200,17 +203,20 @@ dance_vblank SUBROUTINE
         tax                     ; Sprite size
         jsr fx_sprite_prepare
 
-    ;;; Sort rasters
-        GET_RASTERS_COUNT
-        cmp #2
-        bpl .do_sort
-        jmp .dont_sort
-.do_sort:
-        sta ptr3
-        SORT_RASTERS
-.dont_sort:
+    ;;; Clear dance background
+        lda beat_cnt            ; bit 2-3 colors to use
+        lsr
+        lsr
+        and #$03
+        tax
+        lda background_color,X
+        ldx #(BG_LINES - 1)
+.clear_bg_loop:
+        sta dance_bg,X
+        dex
+        bpl .clear_bg_loop
 
-;;; Draw rasters on buffer
+    ;;; Draw rasters on buffer
         GET_RASTERS_COUNT
         sta ptr3
         dec ptr3
@@ -224,14 +230,6 @@ dance_vblank SUBROUTINE
         rts
 
 dance_overscan SUBROUTINE
-    ;; Black background color needed during overscan and vblank for proper TV sync
-        sta WSYNC
-        lda #$00
-        sta COLUPF
-
-    ;; Play the music
-        jsr tia_player
-
     ;; Beat counter update
         dec beat_timer
         bpl .continue
@@ -249,18 +247,15 @@ dance_overscan SUBROUTINE
         DANCEBARS_INIT
 .no_init_dance_bars:
 
-    ;;; Clear dance background
-        lda beat_cnt            ; bit 2-3 colors to use
-        lsr
-        lsr
-        and #$03
-        tax
-        lda background_color,X
-        ldx #(BG_LINES - 1)
-.clear_bg_loop:
-        sta dance_bg,X
-        dex
-        bpl .clear_bg_loop
+    ;;; Sort rasters
+        GET_RASTERS_COUNT
+        cmp #2
+        bpl .do_sort
+        jmp .dont_sort
+.do_sort:
+        sta ptr3
+        SORT_RASTERS
+.dont_sort:
 
         rts
 
@@ -280,7 +275,9 @@ dance_kernel SUBROUTINE
         sta ptr2+1
 
         lda beat_cnt
-        and #$01
+        and #$07
+        tax
+        lda bonhomme_sequence,X
         tax
         lda sp1_bonhomme_low,X
         sta ptr0
