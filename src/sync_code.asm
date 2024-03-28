@@ -1,21 +1,23 @@
-sync_vblank SUBROUTINE
-        lda frame_cnt + 1
-        cmp #2                  ; Next FX after 512 frames
-        bne .continue
-        inc current_fx
-.continue:
-        rts
+    MAC SET_COLUBK
+        lda ptr0
+        and #$7e
+        sta WSYNC
+        clc
+        adc #$40
+        sta COLUBK
+    ENDM
 
     MAC PADDING_LOOP
         ldy #((KERNEL_HEIGHT - 68) / 2)
 .head_loop:
-        sta WSYNC
-        lda ptr0
-        sta COLUBK
+        SET_COLUBK
         inc ptr0
         dey
         bpl .head_loop
     ENDM
+
+sync_vblank SUBROUTINE
+        rts
 
 padding_loop SUBROUTINE
         PADDING_LOOP
@@ -33,9 +35,7 @@ sync_kernel SUBROUTINE
 .outer:
         ldx #15                 ; 16 lines thick
 .inner:
-        sta WSYNC
-        lda ptr0
-        sta COLUBK
+        SET_COLUBK
         lda pf_flush_sync_p0,Y
         sta PF0
         lda pf_flush_sync_p1,Y
@@ -54,9 +54,7 @@ sync_kernel SUBROUTINE
 	dey
 	bpl .outer
 
-        sta WSYNC
-        lda ptr0
-        sta COLUBK
+        SET_COLUBK
         inc ptr0
 
         lda #0
@@ -69,5 +67,12 @@ sync_kernel SUBROUTINE
         sta WSYNC
         lda #0
         sta COLUBK
+        rts
+
 sync_overscan SUBROUTINE
+        lda frame_cnt + 1
+        cmp #2                  ; Next FX after 512 frames
+        bne .continue
+        inc current_fx
+.continue:
         rts
