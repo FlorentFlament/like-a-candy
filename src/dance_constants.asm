@@ -1,5 +1,5 @@
 TEXT_HEIGHT = 64              ; Including preparation
-DANCE_KER_HEIGHT = (203 - TEXT_HEIGHT)          ; Dance Kernel Height
+DANCE_KER_HEIGHT = (KERNEL_HEIGHT - TEXT_HEIGHT)          ; Dance Kernel Height
 BEAT_TIMER_INITVAL = 27
 SPRITE_LINES = 32
 RASTER_WIDTH = 9

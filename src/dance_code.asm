@@ -182,11 +182,6 @@ dance_init SUBROUTINE
         lda #$00
         sta beat_cnt
 
-        ;; set Playfield on
-        lda #$ff
-        sta PF0
-        sta PF1
-        sta PF2
         ;; Set colors to black though
         lda #$00
         sta COLUPF
@@ -202,6 +197,12 @@ dance_vblank SUBROUTINE
         and #$08
         tax                     ; Sprite size
         jsr fx_sprite_prepare
+
+    ;; set Playfield on
+        lda #$ff
+        sta PF0
+        sta PF1
+        sta PF2
 
     ;;; Clear dance background
         lda beat_cnt            ; bit 2-3 colors to use
