@@ -16,9 +16,9 @@ text:
         dc.b "  WELCOME   "
         dc.b "  ON BOARD  "
         dc.b "  TO CLOUQ  "
-        dc.b "CONTRIBUTING"     ; <- end of music (2nd pass)
+        dc.b "CONTRIBUTING"
         dc.b "  TO THIS   "
-        dc.b "TRIBUTE FOR "
+        dc.b " TRIBUTE TO "
         dc.b "SHADOW OF GP"
         dc.b "            "
         dc.b "  CREDITS   "

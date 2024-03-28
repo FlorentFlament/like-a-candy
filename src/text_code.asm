@@ -1,4 +1,12 @@
 TEXT_COLOR = $0e
+TEXT_LINES_COUNT = 52 ; lines of text
+PIXELS_PER_TEXT_LINE = 24 ; including spacing
+TEXT_PIXELS_COUNT = (TEXT_LINES_COUNT * PIXELS_PER_TEXT_LINE)
+MUSIC_FRAMES_COUNT = (50 * 126) ; 126 secs (2 mins 6 secs) at 50 fps
+;;; By moving the text with the following ratio (in 256th)
+;;; The text ends when the music loops
+;; TEXT_TIME_RATIO = TEXT_PIXELS_COUNT * 256 / MUSIC_FRAMES_COUNT
+TEXT_TIME_RATIO = 49 ; That's the best experimental ratio
 
 ; Text to display is pointed to by ptr0
 	MAC m_fx_text_load
@@ -155,38 +163,45 @@ TEXT_LOOP_START equ *
 ;; PRINT_LINE_ALIGN_START equ *
 ;; 	ALIGN 128,$ea		; loop size is 83 bytes - align with nops
 ;; 	echo "[LOSS] Print line align loss:", (* - PRINT_LINE_ALIGN_START)d, "bytes"
+;;; Y in [0; 7] to store the number of lines to display (skipping top lines)
+;;; ptr0 in [0; 7] to store the number of lines to display as well (skipping bottom lines)
 fx_text_print_line:	SUBROUTINE
 	sta WSYNC
 	m_fx_text_kernel_main
 	rts
 
+;;; Uses ptr0, ptr1
 fx_text_setup:	SUBROUTINE
 	m_text_setup
 	rts
 
 text_init:	SUBROUTINE
-	lda #7
+	lda #(PIXELS_PER_TEXT_LINE/2 - 1)
 	sta fx_text_cnt
 	lda #0
 	sta fx_text_idx
+        sta fx_text_scaler
 	rts
 
+;;; Uses ptr0, ptr1
 text_vblank:	SUBROUTINE
         lda #0
         sta CTRLPF
-	lda frame_cnt
-	and #$07
-	bne .continue
+        clc
+        lda #(TEXT_TIME_RATIO)
+        adc fx_text_scaler
+        sta fx_text_scaler
+        bcc .continue
 	dec fx_text_cnt
 	bpl .continue
 	inc fx_text_idx
-	lda #11
+	lda #(PIXELS_PER_TEXT_LINE - 1)
 	sta fx_text_cnt
 .continue:
-	jsr fx_text_setup
+	jsr fx_text_setup ; Uses ptr0, ptr1
 	;; Check for end of text signified by #$00
 	ldy #0
-	lda (ptr0),Y
+	lda (ptr0),Y ; uses ptr0 from fx_text_setup ..
 	bne .end
 	lda #0			; Loop text
 	sta fx_text_idx
@@ -208,6 +223,7 @@ text_vblank:	SUBROUTINE
 
 ; FX Text Kernel
 ; This will be used twice (2 different kernels)
+;;; Uses ptr0, ptr1, ptr2
 text_kernel:	SUBROUTINE
 	;; No reflection
 	lda #$00
@@ -219,14 +235,17 @@ text_kernel:	SUBROUTINE
 	sta NUSIZ1
 	jsr fx_text_position
 
-	lda frame_cnt
-	and #$04
-	bne .no_additional_wsync
+	lda fx_text_cnt
+	and #$01
+	beq .no_additional_wsync
 	sta WSYNC
 	;; skip an additional line to account for the fact that each text line is on 2 lines
 
 .no_additional_wsync:
-	ldy fx_text_cnt
+	lda fx_text_cnt
+        lsr
+        sta ptr2
+        tay
 .skip_loop:
 	cpy #8
 	bcc .display
@@ -243,11 +262,11 @@ text_kernel:	SUBROUTINE
 	sta GRP1
 
 	inc fx_text_idx
-	jsr fx_text_setup
+	jsr fx_text_setup ; Uses ptr0, ptr1
 
-	lda #14
+	lda #14 ;
 	sec
-	sbc fx_text_cnt
+	sbc ptr2
 	sta ptr0
 	ldy #7
 	jsr fx_text_print_line
@@ -256,11 +275,11 @@ text_kernel:	SUBROUTINE
 	sta GRP1
 
 	inc fx_text_idx
-	jsr fx_text_setup
+	jsr fx_text_setup ; Uses ptr0, ptr1
 
 	lda #2
 	sec
-	sbc fx_text_cnt
+	sbc ptr2
 	bmi .end
 	sta ptr0
 	ldy #7
@@ -283,11 +302,11 @@ text_kernel:	SUBROUTINE
 ; i.ie 32 pixels on each side (160 - 96)/2
 ; +68 HBLANK = 100 pixels for RESP0
 ; Must be aligned !
-FX_TEXT_POS_ALIGN equ *
-	ALIGN 8
-	;; echo "[FX text pos] Align loss:", (* - FX_TEXT_POS_ALIGN)d, "bytes"
+;; FX_TEXT_POS_ALIGN equ *
+;; 	ALIGN 8
+;; 	echo "[FX text pos] Align loss:", (* - FX_TEXT_POS_ALIGN)d, "bytes"
 fx_text_position SUBROUTINE
-FX_TEXT_POS equ *
+;; FX_TEXT_POS equ *
 	sta WSYNC
 	ldx #6  		; 2 - Approx 128 pixels / 15
 .posit	dex		; 2
