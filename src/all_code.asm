@@ -1,7 +1,7 @@
-        INCLUDE "text_code.asm"
         INCLUDE "fx_sprites_code.asm"
         INCLUDE "timeline_code.asm"
         INCLUDE "sync_code.asm"
+        INCLUDE "text_code.asm"
         INCLUDE "dance_code.asm"
 
 ;;; Music player wrapper
