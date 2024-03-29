@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import math
 
-VBLANK_COMPUTE = 33 # 61 scanlines in Stella
-OVERSCAN_COMPUTE = 44 # 17 scanlines in Stella
+VBLANK_COMPUTE = 33 # scanlines
+OVERSCAN_COMPUTE = 47 # scanlines (worst observed sort case)
 
 CLOCKS_PER_LINE = 76
 
@@ -12,8 +12,8 @@ CLOCKS_PER_LINE = 76
 # OVERSCAN :  36 scanlines
 # TOTAL    : 312 scanlines
 VERTICAL_SYNC = 4 # scanlines vertical sync signal
-MIN_VBLANK = 48 # scanlines
-MIN_OVERSCAN = 36 - VERTICAL_SYNC # scanlines
+MIN_VBLANK = 47 # scanlines (+1 WSYNC added after each wait loop)
+MIN_OVERSCAN = 35 - VERTICAL_SYNC # scanlines
 TOTAL_SCANLINES = 312
 
 # Possible timers resolution:
@@ -23,38 +23,33 @@ TOTAL_SCANLINES = 312
 # T1024T : 1024 clock interval
 VBLANK_TIMER_RES = 64
 OVERSCAN_TIMER_RES = 64
-KERNAL_TIMER_RES = 1024
+KERNAL_TIMER_RES = 64
+
+def get_timer(scanlines_cnt, timer_res):
+    timer = math.ceil(CLOCKS_PER_LINE * scanlines_cnt / timer_res)
+    return (timer, scanlines_cnt+1)
 
 def compute(vblank_cpu=0, overscan_cpu=0):
-    vblank_clocks = CLOCKS_PER_LINE * max(MIN_VBLANK, vblank_cpu)
-    vblank_timer = math.ceil(vblank_clocks / VBLANK_TIMER_RES)
-    vblank_lines = math.ceil((vblank_timer * VBLANK_TIMER_RES) / CLOCKS_PER_LINE)
+    vblank_timer, vblank_lines = get_timer(max(MIN_VBLANK, vblank_cpu), VBLANK_TIMER_RES)
+    print(vblank_timer, vblank_lines)
 
-    overscan_clocks = CLOCKS_PER_LINE * max(MIN_OVERSCAN, overscan_cpu)
-    overscan_timer = math.ceil(overscan_clocks / OVERSCAN_TIMER_RES)
-    overscan_lines = math.ceil((overscan_timer * OVERSCAN_TIMER_RES) / CLOCKS_PER_LINE)
+    overscan_timer, overscan_lines = get_timer(max(MIN_OVERSCAN, overscan_cpu), OVERSCAN_TIMER_RES)
+    print(overscan_timer, overscan_lines)
 
-    kernal_lines_total = TOTAL_SCANLINES - vblank_lines - overscan_lines - VERTICAL_SYNC
-    kernal_clocks = CLOCKS_PER_LINE * kernal_lines_total
-    kernal_timer = math.floor(kernal_clocks / KERNAL_TIMER_RES)
-    kernal_lines_timer = math.ceil((kernal_timer * KERNAL_TIMER_RES) / CLOCKS_PER_LINE)
-    kernal_lines_diff = kernal_lines_total - kernal_lines_timer
-
-    # Recomputing overscan clocks, adding missing scanlines
-    overscan_clocks = CLOCKS_PER_LINE * (max(MIN_OVERSCAN, overscan_cpu) + kernal_lines_diff)
-    overscan_timer = math.floor(overscan_clocks / OVERSCAN_TIMER_RES)
-    overscan_lines = math.ceil((overscan_timer * OVERSCAN_TIMER_RES) / CLOCKS_PER_LINE)
+    kernal_lines_remain = TOTAL_SCANLINES - vblank_lines - overscan_lines - VERTICAL_SYNC - 1
+    kernal_timer, kernal_lines = get_timer(kernal_lines_remain, KERNAL_TIMER_RES)
+    print(kernal_timer, kernal_lines)
 
     print(f";;; {vblank_lines} vblank scanlines")
     print(f"\tlda #{vblank_timer}")
     print("\tsta TIM64T")
     print()
-    print(f";;; {kernal_lines_timer} kernal scanlines")
+    print(f";;; {kernal_lines} kernal scanlines")
     print(f"\tlda #{kernal_timer}")
-    print("\tsta T1024T")
+    print("\tsta TIM64T")
     print()
-    print(f";;; {overscan_lines + VERTICAL_SYNC} overscan scanlines (inc. vertical sync)")
+    print(f";;; {overscan_lines}+{VERTICAL_SYNC} overscan scanlines (+ vertical sync)")
     print(f"\tlda #{overscan_timer}")
     print("\tsta TIM64T")
-    
+
 compute(VBLANK_COMPUTE, OVERSCAN_COMPUTE)

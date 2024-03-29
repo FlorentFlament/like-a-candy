@@ -41,21 +41,21 @@ main_loop:	SUBROUTINE
 
 .vblank:
 ;;; 48 vblank scanlines
-	lda #57
+	lda #56
 	sta TIM64T
         jsr main_vblank
 	WAIT_TIMINT
 
 .kernel:
-;;; 203 kernal scanlines
-	lda #15
-	sta T1024T
+;;; 212 kernal scanlines
+	lda #251
+	sta TIM64T
         jsr main_kernel
 	WAIT_TIMINT
 
 .overscan:
-;;; 60 overscan scanlines (inc. vertical sync)
-	lda #66
+;;; 48+4 overscan scanlines (+ vertical sync)
+	lda #56
 	sta TIM64T
         jsr main_overscan
 	WAIT_TIMINT
