@@ -1,4 +1,4 @@
-TEXT_HEIGHT = 64              ; Including preparation
+TEXT_HEIGHT = 59              ; Max observed text duration (+1 margin)
 DANCE_KER_HEIGHT = (KERNEL_HEIGHT - TEXT_HEIGHT)          ; Dance Kernel Height
 BEAT_TIMER_INITVAL = 27
 SPRITE_LINES = 32

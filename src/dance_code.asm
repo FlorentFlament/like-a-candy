@@ -152,12 +152,12 @@
     ENDM
 
     MAC DANCE_PADDING
-        ldx #(DANCE_KER_HEIGHT/2 - SPRITE_LINES)
+        ldx #((DANCE_KER_HEIGHT- BG_LINES)/2 - 3) ; Accounts for some initialization
         ldy #0
         lda beat_cnt
         and #$08
         beq .single_size_sprites
-        ldx #(DANCE_KER_HEIGHT/2 - 2*SPRITE_LINES)
+        ldx #((DANCE_KER_HEIGHT - 2*BG_LINES)/2 - 3)
         ldy #2
 .single_size_sprites:
         sty ptr3
