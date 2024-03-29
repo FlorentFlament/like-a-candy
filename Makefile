@@ -4,13 +4,16 @@ DFLAGS=$(patsubst %,-I%,$(INCDIRS)) -f3 -d
 # asm files
 SRC=$(wildcard src/*.asm)
 
-all: main.bin
+all: main-hw.bin main-emu.bin
 
-main.bin: src/main.asm $(SRC)
+main-emu.bin: src/main.asm $(SRC)
 	dasm $< -o$@ -lmain.lst -smain.sym $(DFLAGS)
 
-run: main.bin
+main-hw.bin: src/main.asm $(SRC)
+	dasm $< -o$@ -lmain.lst -smain.sym $(DFLAGS) -DHARDWARE
+
+run: main-emu.bin
 	stella $<
 
 clean:
-	rm -f main.bin main.lst main.sym
+	rm -f main-emu.bin main-hw.bin main.lst main.sym
